@@ -1,16 +1,24 @@
 package hk.edu.ouhk.android.afinal;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.ActionBar;
+import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
@@ -23,17 +31,16 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
-    SwipeRefreshLayout swipeLayout;
-
     private String TAG = MainActivity.class.getSimpleName();
-
+    private DrawerLayout drawerLayout;
+    private NavigationView navigation_view;
     private ProgressDialog pDialog;
     private ListView lv;
     private URL url2;
-
 
     ArrayList<HashMap<String, String>> contactList;
 
@@ -41,28 +48,52 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-         // check if GPS enabled
+        getPermissionForLocation();
+        // check if GPS enabled
 
         final GPSTracker gpsTracker = new GPSTracker(this);
 
         contactList = new ArrayList<>();
 
+        //toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
-        lv = findViewById(R.id.list);
+
+        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                return true;
+            }
+        });
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
+        navigation_view = (NavigationView) findViewById(R.id.navigation_view);
         setSupportActionBar(toolbar);
+        toolbar.inflateMenu(R.menu.menu_main);
 
-        final ActionBar actionBar = getSupportActionBar();
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close);
+        drawerLayout.addDrawerListener(toggle);
+        toggle.syncState();
 
-        if (actionBar != null) {
-            actionBar.setDisplayShowTitleEnabled(false);
-            actionBar.setDisplayHomeAsUpEnabled(true);
-        }
+        navigation_view.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                drawerLayout.closeDrawer(GravityCompat.START);
+                int id = item.getItemId();
+                if (id == R.id.nav_home) {
+                    return true;
+                } else if (id == R.id.nav_setting) {
+                    ChangeToSetting();
+                    return true;
+                }
+                return false;
+            }
+        });
+
+        lv = findViewById(R.id.list);
 
         if (gpsTracker.getIsGPSTrackingEnabled())
         {
-           BuildURL();
-           new GetContacts().execute();
-            Toast.makeText(getApplicationContext(), "Pull down to refresh", Toast.LENGTH_LONG).show();
+            BuildURL();
+            new GetContacts().execute();
         }
         else
         {
@@ -71,47 +102,81 @@ public class MainActivity extends AppCompatActivity {
             // Ask user to enable GPS/network in settings
             gpsTracker.showSettingsAlert();
         }
-
-        // Getting SwipeContainerLayout
-        swipeLayout = findViewById(R.id.swipe_container);
-        // Adding Listener
-        swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                // Your code here
-                BuildURL();
-                contactList.clear();
-                new GetContacts().execute();
-                Toast.makeText(getApplicationContext(), "Refreshed", Toast.LENGTH_LONG).show();
-                // To keep animation for 4 seconds
-                new Handler().postDelayed(new Runnable() {
-                    @Override public void run() {
-                        // Stop animation (This will be after 3 seconds)
-                        swipeLayout.setRefreshing(false);
-                    }
-                }, 1000); // Delay in millis
-            }
-        });
-        // Scheme colors for animation
-        swipeLayout.setColorSchemeColors(
-                getResources().getColor(android.R.color.holo_green_light)
-        );
-
     }
 
-    private void BuildURL() {
+    // Menu icons are inflated just as they were with actionbar
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+        public void onRefresh(MenuItem mi) {
+            // handle click here
+            BuildURL();
+            new GetContacts().execute();
+            Toast.makeText(getApplicationContext(), getString(R.string.Refreshed), Toast.LENGTH_SHORT).show();
+        }
+
+    public void ChangeToSetting(){
+        Intent setting = new Intent(this, SettingPage.class);
+        startActivity(setting);
+        overridePendingTransition(0, 0);
+    }
+
+    //Permission Control
+    private static final int FINE_LOCATION_PERMISSIONS_REQUEST = 1;
+
+    public void getPermissionForLocation() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            if (shouldShowRequestPermissionRationale(
+                    Manifest.permission.ACCESS_FINE_LOCATION)) {
+            }
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    FINE_LOCATION_PERMISSIONS_REQUEST);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String permissions[],
+                                           @NonNull int[] grantResults) {
+        if (requestCode == FINE_LOCATION_PERMISSIONS_REQUEST) {
+            if (grantResults.length == 1 &&
+                    grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, getString(R.string.Location_permission_granted), Toast.LENGTH_SHORT).show();
+                BuildURL();
+                new GetContacts().execute();
+            } else {
+                boolean showRationale = shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION);
+                if (showRationale) {
+                } else {
+                    Toast.makeText(this, getString(R.string.Location_permission_denied), Toast.LENGTH_SHORT).show();
+                }
+            }
+        } else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
+
+    public void BuildURL() {
         final GPSTracker gpsTracker = new GPSTracker(this);
         String stringLatitude = String.valueOf(gpsTracker.latitude);
         String stringLongitude = String.valueOf(gpsTracker.longitude);
+        String lang2 = Locale.getDefault().getLanguage();
         final String BASE_URL =
                 "http://plbpc013.ouhk.edu.hk/toilet/json-toilet.php?";
         final String QUERY_PARAM = "lat";
         final String FORMAT_PARAM = "lng";
+        final String lang = "lang";
 
         Uri builtUri = Uri.parse(BASE_URL)
                 .buildUpon()
                 .appendQueryParameter(QUERY_PARAM, stringLatitude)
                 .appendQueryParameter(FORMAT_PARAM, stringLongitude)
+                .appendQueryParameter(lang, lang2)
                 .build();
         URL url = null;
         try {
@@ -120,6 +185,7 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         url2 = url;
+        contactList.clear();
     }
 
     /**
@@ -132,7 +198,7 @@ public class MainActivity extends AppCompatActivity {
             super.onPreExecute();
             // Showing progress dialog
             pDialog = new ProgressDialog(MainActivity.this);
-            pDialog.setMessage("Please wait...");
+            pDialog.setMessage(getString(R.string.Please_wait));
             pDialog.setCancelable(false);
             pDialog.show();
 

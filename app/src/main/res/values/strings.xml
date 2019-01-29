@@ -16,8 +16,25 @@
     <string name="GPSAlertDialogMessage" />
     <string name="action_settings" />
     <string name="cancel" />
-    <string name="Distance">Distance:</string>
+    <string name="Distance">Distance:  </string>
     <string name="meter">m</string>
     <string name="appbar_scrolling_view_behavior" />
     <string name="maintitle">MainTitle</string>
+    <string name="subtitle">Find Toilet</string>
+    <string name="home">Home</string>
+    <string name="Please_wait">Please wait...</string>
+    <string name="Location_permission_granted">Location permission granted</string>
+    <string name="Location_permission_denied">Location permission denied</string>
+    <string name="Refreshed">Refreshed</string>
+    <string name="my_header_title">Hong Kong Toilet</string>
+    <string name="drawer_open">Drawer opened</string>
+    <string name="drawer_close">Drawer closed</string>
+    <string name="NoOfRow">Number of Row show in list</string>
+    <string name="RowNo">No. of Row:</string>
+    <string name="Row">10</string>
+    <string name="select_language">Select Language</string>
+    <string name="english">English</string>
+    <string name="Zh_HK">中文(繁體)‎</string>
+    <string name="ZH_CN">中文(簡體)‎</string>
+    <string name="apply">Apply</string>
 </resources>

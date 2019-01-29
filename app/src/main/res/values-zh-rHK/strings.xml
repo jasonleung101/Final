@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">香港廁所</string>
+    <string name="latitude_label">Latitude</string>
+    <string name="longitude_label">Longitude</string>
+
+    <string name="no_location_detected">
+        沒有檢測到位置。 確保在設備上啟用了位置。
+    </string>
+
+    <string name="permission_rationale">需要位置權限</string>
+    <string name="permission_denied_explanation">位置權限被拒絕。</string>
+    <string name="settings">設置</string>
+    <string name="GPSAlertDialogTitle" />
+    <string name="GPSAlertDialogMessage" />
+    <string name="action_settings" />
+    <string name="cancel" />
+    <string name="Distance">距離:  </string>
+    <string name="meter">米</string>
+    <string name="appbar_scrolling_view_behavior" />
+    <string name="maintitle">MainTitle</string>
+    <string name="open" />
+    <string name="close" />
+    <string name="subtitle">尋找廁所</string>
+    <string name="home">主頁</string>
+    <string name="Please_wait">請等待</string>
+    <string name="Location_permission_granted">授予位置許可</string>
+    <string name="Location_permission_denied">位置許可被拒絕</string>
+    <string name="Refreshed">完成刷新</string>
+    <string name="my_header_title">香港廁所</string>
+    <string name="NoOfRow">Setting for number of row</string>
+    <string name="RowNo">No. of Row:</string>
+    <string name="Row">10</string>
+    <string name="apply">Apply</string>
+</resources>
