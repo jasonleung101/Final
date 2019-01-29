@@ -1,16 +1,25 @@
 package hk.edu.ouhk.android.afinal;
 
-import android.content.Intent;
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.support.v7.widget.Toolbar;
+import android.text.GetChars;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
@@ -22,7 +31,9 @@ import org.json.JSONObject;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -34,35 +45,54 @@ public class MainActivity extends AppCompatActivity {
     private ListView lv;
     private URL url2;
 
-
     ArrayList<HashMap<String, String>> contactList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-         // check if GPS enabled
+        getPermissionForLocation();
+        // check if GPS enabled
 
         final GPSTracker gpsTracker = new GPSTracker(this);
 
         contactList = new ArrayList<>();
 
+        //toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
-        lv = findViewById(R.id.list);
+
+        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                return true;
+            }
+        });
         setSupportActionBar(toolbar);
+        toolbar.inflateMenu(R.menu.menu_main);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
 
-        final ActionBar actionBar = getSupportActionBar();
+        DrawerLayout mDrawerLayout = findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle mActionBarDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.open, R.string.close) {
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
 
-        if (actionBar != null) {
-            actionBar.setDisplayShowTitleEnabled(false);
-            actionBar.setDisplayHomeAsUpEnabled(true);
-        }
+            }
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                super.onDrawerClosed(drawerView);
+            }
+        };
+        mActionBarDrawerToggle.syncState();
+        mDrawerLayout.setDrawerListener(mActionBarDrawerToggle);
+
+        lv = findViewById(R.id.list);
 
         if (gpsTracker.getIsGPSTrackingEnabled())
         {
-           BuildURL();
-           new GetContacts().execute();
-            Toast.makeText(getApplicationContext(), "Pull down to refresh", Toast.LENGTH_LONG).show();
+            BuildURL();
+            new GetContacts().execute();
         }
         else
         {
@@ -71,32 +101,59 @@ public class MainActivity extends AppCompatActivity {
             // Ask user to enable GPS/network in settings
             gpsTracker.showSettingsAlert();
         }
+    }
 
-        // Getting SwipeContainerLayout
-        swipeLayout = findViewById(R.id.swipe_container);
-        // Adding Listener
-        swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                // Your code here
+    // Menu icons are inflated just as they were with actionbar
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+        public void onRefresh(MenuItem mi) {
+            // handle click here
+            BuildURL();
+            contactList.clear();
+            new GetContacts().execute();
+            Toast.makeText(getApplicationContext(), "Refreshed", Toast.LENGTH_SHORT).show();
+        }
+
+    //Permission Control
+    private static final int FINE_LOCATION_PERMISSIONS_REQUEST = 1;
+
+    public void getPermissionForLocation() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            if (shouldShowRequestPermissionRationale(
+                    Manifest.permission.ACCESS_FINE_LOCATION)) {
+            }
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    FINE_LOCATION_PERMISSIONS_REQUEST);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String permissions[],
+                                           @NonNull int[] grantResults) {
+        if (requestCode == FINE_LOCATION_PERMISSIONS_REQUEST) {
+            if (grantResults.length == 1 &&
+                    grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "Location permission granted", Toast.LENGTH_SHORT).show();
                 BuildURL();
                 contactList.clear();
                 new GetContacts().execute();
-                Toast.makeText(getApplicationContext(), "Refreshed", Toast.LENGTH_LONG).show();
-                // To keep animation for 4 seconds
-                new Handler().postDelayed(new Runnable() {
-                    @Override public void run() {
-                        // Stop animation (This will be after 3 seconds)
-                        swipeLayout.setRefreshing(false);
-                    }
-                }, 1000); // Delay in millis
+            } else {
+                boolean showRationale = shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION);
+                if (showRationale) {
+                } else {
+                    Toast.makeText(this, "Location permission denied", Toast.LENGTH_SHORT).show();
+                }
             }
-        });
-        // Scheme colors for animation
-        swipeLayout.setColorSchemeColors(
-                getResources().getColor(android.R.color.holo_green_light)
-        );
-
+        } else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
     }
 
     private void BuildURL() {

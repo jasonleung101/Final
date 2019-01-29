@@ -20,4 +20,8 @@
     <string name="meter">m</string>
     <string name="appbar_scrolling_view_behavior" />
     <string name="maintitle">MainTitle</string>
+    <string name="open" />
+    <string name="close" />
+    <string name="subtitle">Find Toilet</string>
+    <string name="home">Home</string>
 </resources>
