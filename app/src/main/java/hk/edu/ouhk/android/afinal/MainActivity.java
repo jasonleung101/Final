@@ -44,8 +44,8 @@ public class MainActivity extends AppCompatActivity {
     private URL gmap;
     private URL url2;
     private String row;
-    private String lat;
-    private String lng;
+    private String dlat;
+    private String dlng;
 
     ArrayList<HashMap<String, String>> contactList;
 
@@ -115,10 +115,12 @@ public class MainActivity extends AppCompatActivity {
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> ListAdapter, View view, int position, long id) {
-                Object item = ListAdapter.getItemAtPosition(position);
-
+                dlat = contactList.get(position).get("lat");
+                dlng = contactList.get(position).get("lng");
                 BuildGMap();
-                Toast.makeText(getApplicationContext(),gmap.toString(), Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
+                        Uri.parse(gmap.toString()));
+                startActivity(intent);
             }
         });
     }
@@ -195,9 +197,9 @@ public class MainActivity extends AppCompatActivity {
         mOriginLoc = OriginLoc.toString();
 
         StringBuilder DestLoc = new StringBuilder();
-        DestLoc.append(lat);
-        DestLoc.append(",");
-        DestLoc.append(lng);
+        DestLoc.append(dlat);
+        DestLoc.append(", ");
+        DestLoc.append(dlng);
         mDestLoc = DestLoc.toString();
 
         final String BASE_URL =
@@ -286,8 +288,8 @@ public class MainActivity extends AppCompatActivity {
                         JSONObject c = contacts.getJSONObject(i);
 
                         String id = c.getString("id");
-                        String lat2 = c.getString("lat");
-                        String lng2 = c.getString("lng");
+                        String lat = c.getString("lat");
+                        String lng = c.getString("lng");
                         String name = c.getString("name");
                         String address = c.getString("address");
                         String distance = c.getString("distance");
@@ -297,8 +299,8 @@ public class MainActivity extends AppCompatActivity {
 
                         // adding each child node to HashMap key => value
                         contact.put("id", id);
-                        lat = lat2;
-                        lng = lng2;
+                        contact.put("lat", lat);
+                        contact.put("lng", lng);
                         contact.put("name", name);
                         contact.put("address", address);
                         contact.put("distance",distance);

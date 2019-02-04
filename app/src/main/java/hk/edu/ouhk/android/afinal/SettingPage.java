@@ -16,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.RadioButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.Locale;
@@ -23,21 +24,26 @@ import java.util.Locale;
 public class SettingPage extends AppCompatActivity {
 
     private DrawerLayout drawerLayout;
-    private NavigationView navigation_view;
     public static final String EXTRA_MESSAGE = "hk.edu.ouhk.android.final.MESSAGE";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setting_page);
+        final GPSTracker gpsTracker = new GPSTracker(this);
         //toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
-        drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
-        navigation_view = (NavigationView) findViewById(R.id.navigation_view);
+        drawerLayout = findViewById(R.id.drawerLayout);
+        NavigationView navigation_view = findViewById(R.id.navigation_view);
         setSupportActionBar(toolbar);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close);
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
+
+        TextView LatView = findViewById(R.id.LatView);
+        LatView.setText(String.valueOf(gpsTracker.latitude));
+        TextView LngView = findViewById(R.id.LngView);
+        LngView.setText(String.valueOf(gpsTracker.longitude));
 
         //nav drawer
         navigation_view.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {

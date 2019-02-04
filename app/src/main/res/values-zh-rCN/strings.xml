@@ -27,10 +27,9 @@
         <string name="Location_permission_granted">授予位置许可</string>
         <string name="Location_permission_denied">位置许可被拒绝</string>
         <string name="Refreshed">完成刷新</string>
-    <string name="my_header_title">香港厕所</string>
-    <string name="NoOfRow">Setting for number of row</string>
-    <string name="RowNo">No. of Row:</string>
-    <string name="Row">10</string>
-    <string name="apply">Apply</string>
-    <string name="NoOfRowDisplay">1-50</string>
+        <string name="NoOfRow">行数设定</string>
+        <string name="RowNo">行数:</string>
+        <string name="Row">10</string>
+        <string name="apply">应用</string>
+        <string name="NoOfRowDisplay">1-50</string>
 </resources>
