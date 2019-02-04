@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -19,9 +20,12 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.Spinner;
 import android.widget.Toast;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -33,14 +37,20 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     private String TAG = MainActivity.class.getSimpleName();
     private DrawerLayout drawerLayout;
     private NavigationView navigation_view;
     private ProgressDialog pDialog;
     private ListView lv;
+    private URL gmap;
     private URL url2;
+    private String row;
+    private String lat;
+    private String lng;
+    private String dlat;
+    private String dlng;
 
     ArrayList<HashMap<String, String>> contactList;
 
@@ -54,6 +64,10 @@ public class MainActivity extends AppCompatActivity {
         final GPSTracker gpsTracker = new GPSTracker(this);
 
         contactList = new ArrayList<>();
+
+        Intent intent = getIntent();
+        String message = intent.getStringExtra(SettingPage.EXTRA_MESSAGE);
+        row = message;
 
         //toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -102,6 +116,19 @@ public class MainActivity extends AppCompatActivity {
             // Ask user to enable GPS/network in settings
             gpsTracker.showSettingsAlert();
         }
+
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> ListAdapter, View view, int position, long id) {
+                Object item = ListAdapter.getItemAtPosition(position);
+                dlat = contactList.get(position).get("lat");
+                dlng = contactList.get(position).get("lng");
+                BuildGMap();
+                Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
+                        Uri.parse(gmap.toString()));
+                startActivity(intent);
+            }
+        });
     }
 
     // Menu icons are inflated just as they were with actionbar
@@ -109,6 +136,13 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+        MenuItem item = menu.findItem(R.id.spinner);
+        Spinner spinner = (Spinner) MenuItemCompat.getActionView(item);
+        spinner.setOnItemSelectedListener(this);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.spinner_list_item_array, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
         return true;
     }
 
@@ -121,6 +155,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void ChangeToSetting(){
         Intent setting = new Intent(this, SettingPage.class);
+        finish();
         startActivity(setting);
         overridePendingTransition(0, 0);
     }
@@ -161,6 +196,45 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void BuildGMap() {
+        final GPSTracker gpsTracker = new GPSTracker(this);
+        String stringLatitude = String.valueOf(gpsTracker.latitude);
+        String stringLongitude = String.valueOf(gpsTracker.longitude);
+        String mOriginLoc;
+        String mDestLoc;
+
+        StringBuilder OriginLoc = new StringBuilder();
+        OriginLoc.append(stringLatitude);
+        OriginLoc.append(",");
+        OriginLoc.append(stringLongitude);
+        mOriginLoc = OriginLoc.toString();
+
+        StringBuilder DestLoc = new StringBuilder();
+        DestLoc.append(lat);
+        DestLoc.append(",");
+        DestLoc.append(lng);
+        mDestLoc = DestLoc.toString();
+
+        final String BASE_URL =
+                "http://maps.google.com/maps?";
+        final String start = "saddr";
+        final String end = "daddr";
+
+        Uri builtUri = Uri.parse(BASE_URL)
+                .buildUpon()
+                .appendQueryParameter(start, mOriginLoc)
+                .appendQueryParameter(end, mDestLoc)
+                .build();
+        URL gmap2 = null;
+        try {
+            gmap2 = new URL(builtUri.toString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        gmap = gmap2;
+    }
+
+
     public void BuildURL() {
         final GPSTracker gpsTracker = new GPSTracker(this);
         String stringLatitude = String.valueOf(gpsTracker.latitude);
@@ -171,12 +245,14 @@ public class MainActivity extends AppCompatActivity {
         final String QUERY_PARAM = "lat";
         final String FORMAT_PARAM = "lng";
         final String lang = "lang";
+        final String row2 = "display_row";
 
         Uri builtUri = Uri.parse(BASE_URL)
                 .buildUpon()
                 .appendQueryParameter(QUERY_PARAM, stringLatitude)
                 .appendQueryParameter(FORMAT_PARAM, stringLongitude)
                 .appendQueryParameter(lang, lang2)
+                .appendQueryParameter(row2, row)
                 .build();
         URL url = null;
         try {
@@ -186,6 +262,16 @@ public class MainActivity extends AppCompatActivity {
         }
         url2 = url;
         contactList.clear();
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        Toast.makeText(MainActivity.this, parent.getSelectedItem().toString(), Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
     }
 
     /**
@@ -225,6 +311,8 @@ public class MainActivity extends AppCompatActivity {
                         JSONObject c = contacts.getJSONObject(i);
 
                         String id = c.getString("id");
+                        String lat2 = c.getString("lat");
+                        String lng2 = c.getString("lng");
                         String name = c.getString("name");
                         String address = c.getString("address");
                         String distance = c.getString("distance");
@@ -234,6 +322,8 @@ public class MainActivity extends AppCompatActivity {
 
                         // adding each child node to HashMap key => value
                         contact.put("id", id);
+                        lat = lat2;
+                        lng = lng2;
                         contact.put("name", name);
                         contact.put("address", address);
                         contact.put("distance",distance);

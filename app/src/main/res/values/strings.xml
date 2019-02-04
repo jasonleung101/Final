@@ -32,9 +32,11 @@
     <string name="NoOfRow">Number of Row show in list</string>
     <string name="RowNo">No. of Row:</string>
     <string name="Row">10</string>
-    <string name="select_language">Select Language</string>
-    <string name="english">English</string>
-    <string name="Zh_HK">中文(繁體)‎</string>
-    <string name="ZH_CN">中文(簡體)‎</string>
     <string name="apply">Apply</string>
+    <string name="NoOfRowDisplay">1-50</string>
+    <string-array name="spinner_list_item_array">
+        <item>test1</item>
+        <item>test2</item>
+    </string-array>
+
 </resources>
