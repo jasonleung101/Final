@@ -19,6 +19,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
@@ -40,7 +41,11 @@ public class MainActivity extends AppCompatActivity {
     private NavigationView navigation_view;
     private ProgressDialog pDialog;
     private ListView lv;
+    private URL gmap;
     private URL url2;
+    private String row;
+    private String lat;
+    private String lng;
 
     ArrayList<HashMap<String, String>> contactList;
 
@@ -54,6 +59,10 @@ public class MainActivity extends AppCompatActivity {
         final GPSTracker gpsTracker = new GPSTracker(this);
 
         contactList = new ArrayList<>();
+
+        Intent intent = getIntent();
+        String message = intent.getStringExtra(SettingPage.EXTRA_MESSAGE);
+        row = message;
 
         //toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -102,6 +111,16 @@ public class MainActivity extends AppCompatActivity {
             // Ask user to enable GPS/network in settings
             gpsTracker.showSettingsAlert();
         }
+
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> ListAdapter, View view, int position, long id) {
+                Object item = ListAdapter.getItemAtPosition(position);
+
+                BuildGMap();
+                Toast.makeText(getApplicationContext(),gmap.toString(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     // Menu icons are inflated just as they were with actionbar
@@ -121,6 +140,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void ChangeToSetting(){
         Intent setting = new Intent(this, SettingPage.class);
+        finish();
         startActivity(setting);
         overridePendingTransition(0, 0);
     }
@@ -161,6 +181,45 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void BuildGMap() {
+        final GPSTracker gpsTracker = new GPSTracker(this);
+        String stringLatitude = String.valueOf(gpsTracker.latitude);
+        String stringLongitude = String.valueOf(gpsTracker.longitude);
+        String mOriginLoc;
+        String mDestLoc;
+
+        StringBuilder OriginLoc = new StringBuilder();
+        OriginLoc.append(stringLatitude);
+        OriginLoc.append(",");
+        OriginLoc.append(stringLongitude);
+        mOriginLoc = OriginLoc.toString();
+
+        StringBuilder DestLoc = new StringBuilder();
+        DestLoc.append(lat);
+        DestLoc.append(",");
+        DestLoc.append(lng);
+        mDestLoc = DestLoc.toString();
+
+        final String BASE_URL =
+                "http://maps.google.com/maps?";
+        final String start = "saddr";
+        final String end = "daddr";
+
+        Uri builtUri = Uri.parse(BASE_URL)
+                .buildUpon()
+                .appendQueryParameter(start, mOriginLoc)
+                .appendQueryParameter(end, mDestLoc)
+                .build();
+        URL gmap2 = null;
+        try {
+            gmap2 = new URL(builtUri.toString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        gmap = gmap2;
+    }
+
+
     public void BuildURL() {
         final GPSTracker gpsTracker = new GPSTracker(this);
         String stringLatitude = String.valueOf(gpsTracker.latitude);
@@ -171,12 +230,14 @@ public class MainActivity extends AppCompatActivity {
         final String QUERY_PARAM = "lat";
         final String FORMAT_PARAM = "lng";
         final String lang = "lang";
+        final String row2 = "display_row";
 
         Uri builtUri = Uri.parse(BASE_URL)
                 .buildUpon()
                 .appendQueryParameter(QUERY_PARAM, stringLatitude)
                 .appendQueryParameter(FORMAT_PARAM, stringLongitude)
                 .appendQueryParameter(lang, lang2)
+                .appendQueryParameter(row2, row)
                 .build();
         URL url = null;
         try {
@@ -225,6 +286,8 @@ public class MainActivity extends AppCompatActivity {
                         JSONObject c = contacts.getJSONObject(i);
 
                         String id = c.getString("id");
+                        String lat2 = c.getString("lat");
+                        String lng2 = c.getString("lng");
                         String name = c.getString("name");
                         String address = c.getString("address");
                         String distance = c.getString("distance");
@@ -234,6 +297,8 @@ public class MainActivity extends AppCompatActivity {
 
                         // adding each child node to HashMap key => value
                         contact.put("id", id);
+                        lat = lat2;
+                        lng = lng2;
                         contact.put("name", name);
                         contact.put("address", address);
                         contact.put("distance",distance);

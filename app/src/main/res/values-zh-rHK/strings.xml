@@ -32,4 +32,5 @@
     <string name="RowNo">No. of Row:</string>
     <string name="Row">10</string>
     <string name="apply">Apply</string>
+    <string name="NoOfRowDisplay">1-50</string>
 </resources>
