@@ -53,7 +53,7 @@
                 android:layout_marginTop="41dp"
                 android:ems="10"
                 android:hint="@string/NoOfRowDisplay"
-                android:inputType="textPersonName"
+                android:inputType="numberSigned|numberDecimal"
                 app:layout_constraintStart_toEndOf="@+id/RowNo"
                 app:layout_constraintTop_toTopOf="parent" />
 
