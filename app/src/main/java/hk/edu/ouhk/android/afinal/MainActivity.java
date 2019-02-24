@@ -51,6 +51,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private String lng;
     private String dlat;
     private String dlng;
+    private int limit;
+    private double dist;
 
     ArrayList<HashMap<String, String>> contactList;
 
@@ -140,8 +142,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         Spinner spinner = (Spinner) MenuItemCompat.getActionView(item);
         spinner.setOnItemSelectedListener(this);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.spinner_list_item_array, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                R.array.spinner_list_item_array, R.layout.spinner_item);
+        adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
         spinner.setAdapter(adapter);
         return true;
     }
@@ -266,7 +268,28 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        Toast.makeText(MainActivity.this, parent.getSelectedItem().toString(), Toast.LENGTH_SHORT).show();
+        switch (position) {
+            case 0:
+                limit = -1;
+                BuildURL();
+                new GetContacts().execute();
+                break;
+            case 1:
+                limit = 500;
+                BuildURL();
+                new GetContacts().execute();
+                break;
+            case 2:
+                limit = 1000;
+                BuildURL();
+                new GetContacts().execute();
+                break;
+            case 3:
+                limit = 2000;
+                BuildURL();
+                new GetContacts().execute();
+                break;
+        }
     }
 
     @Override
@@ -315,21 +338,26 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         String lng2 = c.getString("lng");
                         String name = c.getString("name");
                         String address = c.getString("address");
-                        String distance = c.getString("distance");
+                        Double distance = c.getDouble("distance");
+
 
                         // tmp hash map for single contact
                         HashMap<String, String> contact = new HashMap<>();
 
                         // adding each child node to HashMap key => value
-                        contact.put("id", id);
-                        lat = lat2;
-                        lng = lng2;
-                        contact.put("name", name);
-                        contact.put("address", address);
-                        contact.put("distance",distance);
+                        if(distance<limit || limit == -1) {
+                            contact.put("id", id);
+                            lat = lat2;
+                            lng = lng2;
+                            contact.put("name", name);
+                            contact.put("address", address);
+                            contact.put("distance", distance.toString());
+                            dist = distance;
 
-                        // adding contact to contact list
-                        contactList.add(contact);
+
+                            // adding contact to contact list
+                            contactList.add(contact);
+                        }
                     }
                 } catch (final JSONException e) {
                     Log.e(TAG, "Json parsing error: " + e.getMessage());
@@ -364,17 +392,18 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         @Override
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
-            // Dismiss the progress dialog
-            if (pDialog.isShowing())
-                pDialog.dismiss();
+                // Dismiss the progress dialog
+                if (pDialog.isShowing())
+                    pDialog.dismiss();
+            if(dist<limit || limit == -1) {
+                ListAdapter adapter = new SimpleAdapter(
+                        MainActivity.this, contactList,
+                        R.layout.list_item, new String[]{"name", "address",
+                        "distance"}, new int[]{R.id.name,
+                        R.id.address, R.id.distance});
 
-            ListAdapter adapter = new SimpleAdapter(
-                    MainActivity.this, contactList,
-                    R.layout.list_item, new String[]{"name", "address",
-                    "distance"},new int[]{R.id.name,
-                    R.id.address, R.id.distance});
-
-            lv.setAdapter(adapter);
+                lv.setAdapter(adapter);
+            }
         }
 
     }

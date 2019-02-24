@@ -35,8 +35,10 @@
     <string name="apply">Apply</string>
     <string name="NoOfRowDisplay">1-50</string>
     <string-array name="spinner_list_item_array">
-        <item>test1</item>
-        <item>test2</item>
+        <item>unlimited</item>
+        <item>500m</item>
+        <item>1 KM</item>
+        <item>2 KM</item>
     </string-array>
 
 </resources>
