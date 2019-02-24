@@ -212,9 +212,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         mOriginLoc = OriginLoc.toString();
 
         StringBuilder DestLoc = new StringBuilder();
-        DestLoc.append(lat);
+        DestLoc.append(dlat);
         DestLoc.append(",");
-        DestLoc.append(lng);
+        DestLoc.append(dlng);
         mDestLoc = DestLoc.toString();
 
         final String BASE_URL =
@@ -334,8 +334,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         JSONObject c = contacts.getJSONObject(i);
 
                         String id = c.getString("id");
-                        String lat2 = c.getString("lat");
-                        String lng2 = c.getString("lng");
+                        String lat = c.getString("lat");
+                        String lng = c.getString("lng");
                         String name = c.getString("name");
                         String address = c.getString("address");
                         Double distance = c.getDouble("distance");
@@ -347,8 +347,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         // adding each child node to HashMap key => value
                         if(distance<limit || limit == -1) {
                             contact.put("id", id);
-                            lat = lat2;
-                            lng = lng2;
+                            contact.put("lat", lat);
+                            contact.put("lng", lng);
                             contact.put("name", name);
                             contact.put("address", address);
                             contact.put("distance", distance.toString());
