@@ -354,7 +354,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                             contact.put("distance", distance.toString());
                             dist = distance;
 
-
                             // adding contact to contact list
                             contactList.add(contact);
                         }
