@@ -47,8 +47,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private URL gmap;
     private URL url2;
     private String row;
-    private String lat;
-    private String lng;
+    private Double lat;
+    private Double lng;
     private String dlat;
     private String dlng;
     private int limit;
@@ -63,7 +63,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         getPermissionForLocation();
         // check if GPS enabled
 
-        final GPSTracker gpsTracker = new GPSTracker(this);
+        GPSTracker  gpsTracker=new GPSTracker(this);
+        double lat2 = gpsTracker.getLatitude();
+        double lng2 = gpsTracker.getLongitude();
+        lat = lat2;
+        lng = lng2;
 
         contactList = new ArrayList<>();
 
@@ -106,7 +110,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         lv = findViewById(R.id.list);
 
-        if (gpsTracker.getIsGPSTrackingEnabled())
+        if (gpsTracker.canGetLocation())
         {
             BuildURL();
             new GetContacts().execute();
@@ -200,8 +204,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     public void BuildGMap() {
         final GPSTracker gpsTracker = new GPSTracker(this);
-        String stringLatitude = String.valueOf(gpsTracker.latitude);
-        String stringLongitude = String.valueOf(gpsTracker.longitude);
+        lat = gpsTracker.getLatitude();
+        lng = gpsTracker.getLongitude();
+        String stringLatitude = lat.toString();
+        String stringLongitude = lng.toString();
         String mOriginLoc;
         String mDestLoc;
 
@@ -239,8 +245,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     public void BuildURL() {
         final GPSTracker gpsTracker = new GPSTracker(this);
-        String stringLatitude = String.valueOf(gpsTracker.latitude);
-        String stringLongitude = String.valueOf(gpsTracker.longitude);
+        lat = gpsTracker.getLatitude();
+        lng = gpsTracker.getLongitude();
+        String stringLatitude = lat.toString();
+        String stringLongitude = lng.toString();
         String lang2 = Locale.getDefault().getLanguage();
         final String BASE_URL =
                 "http://plbpc013.ouhk.edu.hk/toilet/json-toilet.php?";
@@ -377,7 +385,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     @Override
                     public void run() {
                         Toast.makeText(getApplicationContext(),
-                                "Couldn't get json from server. Check LogCat for possible errors!",
+                                "ERROR"+url2,
                                 Toast.LENGTH_LONG)
                                 .show();
                     }
