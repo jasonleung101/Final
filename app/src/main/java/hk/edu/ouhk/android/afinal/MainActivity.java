@@ -188,8 +188,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             if (grantResults.length == 1 &&
                     grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(this, getString(R.string.Location_permission_granted), Toast.LENGTH_SHORT).show();
-                BuildURL();
-                new GetContacts().execute();
             } else {
                 boolean showRationale = shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION);
                 if (showRationale) {

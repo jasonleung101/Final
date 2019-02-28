@@ -30,25 +30,27 @@
         <TextView
             android:id="@+id/textView"
             android:layout_width="wrap_content"
-            android:layout_height="20dp"
+            android:layout_height="match_parent"
             android:text="@string/Distance"
             android:textSize="16sp"/>
 
         <TextView
             android:id="@+id/distance"
-            android:layout_width="75dp"
-            android:layout_height="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:textColor="#5d5d5d"
             android:textStyle="bold"
-            android:textSize="16sp"/>
+            android:textSize="16sp"
+            android:maxLength="5"/>
 
         <TextView
             android:id="@+id/textView2"
-            android:layout_width="0dp"
-            android:layout_height="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="@string/meter"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            android:layout_marginLeft="4dp"/>
 
     </LinearLayout>
 

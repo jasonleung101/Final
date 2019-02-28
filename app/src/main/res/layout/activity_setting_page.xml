@@ -47,12 +47,13 @@
 
             <EditText
                 android:id="@+id/editRow"
-                android:layout_width="45dp"
+                android:layout_width="50dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="41dp"
                 android:ems="10"
                 android:hint="@string/NoOfRowDisplay"
+                android:textSize="16sp"
                 android:inputType="textPersonName"
                 app:layout_constraintStart_toEndOf="@+id/RowNo"
                 app:layout_constraintTop_toTopOf="parent" />
