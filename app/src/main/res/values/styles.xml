@@ -17,7 +17,7 @@
     </style>
 
     <style name="Toolbar.TitleText" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
-        <item name="android:textSize">17sp</item>
+        <item name="android:textSize">19sp</item>
     </style>
 
     <style name="Toolbar.SubTitleText" parent="TextAppearance.Widget.AppCompat.Toolbar.Subtitle">
