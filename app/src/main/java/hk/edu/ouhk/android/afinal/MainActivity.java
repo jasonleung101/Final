@@ -256,6 +256,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         final String FORMAT_PARAM = "lng";
         final String lang = "lang";
         final String row2 = "display_row";
+        final String index = "row_index";
 
         Uri builtUri = Uri.parse(BASE_URL)
                 .buildUpon()
@@ -302,8 +303,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
-
     }
+
+
 
     /**
      * Async task class to get json by making HTTP call
@@ -412,6 +414,5 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 lv.setAdapter(adapter);
             }
         }
-
     }
 }

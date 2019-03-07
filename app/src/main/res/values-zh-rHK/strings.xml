@@ -33,6 +33,7 @@
     <string name="Row">10</string>
     <string name="apply">應用</string>
     <string name="NoOfRowDisplay">1-50</string>
+    <string name="version">版本:1.0.0(Release)</string>
     <string-array name="spinner_list_item_array">
         <item>距離不限</item>
         <item>500米</item>
